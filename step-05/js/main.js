@@ -115,7 +115,7 @@ var canvas = document.querySelector("#canvas");
 var mediaRecorder;
 
 shareButton.onclick = startCapture;
-recordButton.onclick = startRecordiing;
+recordButton.onclick = toggleRecording;
 
 
 navigator.mediaDevices.getUserMedia(mediaOption)
@@ -157,10 +157,11 @@ var recordOption = {
 var recordedChunks = [];
 function handleStop(event) {
   console.log('Recorder stopped: ', event);
-  console.log('Recorded Blobs: ', recordedBlobs);
+  console.log('Recorded Blobs: ', recordedChunks);
 }
 
-async function startRecordiing() {
+
+async function startRecording() {
   var stream = await navigator.mediaDevices.getUserMedia(mediaOption);
 
 
@@ -188,6 +189,18 @@ function handleDataAvailable(event) {
     download();
   } else {
     // ...
+  }
+}
+
+
+async function toggleRecording() {
+  if (recordButton.textContent === '녹화 시작') {
+    await startRecording();
+  } else {
+    stopRecording();
+    recordButton.textContent = '녹화 시작';
+    // playButton.disabled = false;
+    // downloadButton.disabled = false;
   }
 }
 
