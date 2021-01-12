@@ -110,13 +110,14 @@ var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
 var shareButton = document.querySelector('button#shareScreenBtn');
 var recordButton = document.querySelector('button#recordScreenBtn');
+var downloadButton = document.querySelector('button#recordDownloadBtn');
 var videoElem = document.querySelector('#videoElem');
 var canvas = document.querySelector("#canvas");
 var mediaRecorder;
 
 shareButton.onclick = startCapture;
 recordButton.onclick = toggleRecording;
-
+downloadButton.onclick = download;
 
 navigator.mediaDevices.getUserMedia(mediaOption)
   .then(gotStream)
@@ -186,7 +187,7 @@ function handleDataAvailable(event) {
   if (event.data.size > 0) {
     recordedChunks.push(event.data);
     console.log(recordedChunks);
-    download();
+    // download();
   } else {
     // ...
   }
