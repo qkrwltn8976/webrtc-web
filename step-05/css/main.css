@@ -29,3 +29,8 @@ body {
 .remoteVideoInChatting {
   display: inline-block !important;
 }
+
+.blur {
+  -webkit-filter: blur(7px);
+  filter: blur(7px);
+}

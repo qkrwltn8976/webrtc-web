@@ -113,11 +113,13 @@ var recordButton = document.querySelector('button#recordScreenBtn');
 var downloadButton = document.querySelector('button#recordDownloadBtn');
 var videoElem = document.querySelector('#videoElem');
 var canvas = document.querySelector("#canvas");
+var blurButton = document.querySelector("#blurScreenBtn");
 var mediaRecorder;
 
 shareButton.onclick = startCapture;
 recordButton.onclick = toggleRecording;
 downloadButton.onclick = download;
+blurButton.onclick = blurScreen;
 
 navigator.mediaDevices.getUserMedia(mediaOption)
   .then(gotStream)
@@ -149,6 +151,7 @@ async function startCapture(captureOption) {
   // return captureStream;
 }
 
+/************************************************************************* */
 // 화면 녹화
 var recordOption = {
   audio: true,
@@ -217,6 +220,10 @@ function download() {
   a.download = "test.webm";
   a.click();
   window.URL.revokeObjectURL(url);
+}
+
+function blurScreen() {
+  localVideo.className = "blur";
 }
 
 // demo: to download after 9sec
