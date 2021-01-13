@@ -222,10 +222,34 @@ function download() {
   window.URL.revokeObjectURL(url);
 }
 
-function blurScreen() {
-  localVideo.className = "blur";
-}
+const ctx = canvas.getContext('2d');
 
+async function blurScreen() { 
+  canvas.height = localVideo.videoHeight;
+  canvas.width = localVideo.videoWidth;
+
+  let options = {
+    multiplier: 0.75,
+    stride: 32,
+    quantBytes: 4
+  }
+  bodyPix.load(options)
+    .then(net => perform(net))
+    .catch(err => console.log(err))
+  // localVideo.className = "blur";
+  // const net = await bodyPix.load();
+}
+async function perform(net) {
+  while (1) {
+    const segmentation = await net.segmentPerson(localVideo);
+
+    const backgroundBlurAmount = 6;
+    const edgeBlurAmount = 2;
+    const flipHorizontal = true;
+
+    await bodyPix.drawBokehEffect(canvas, localVideo, segmentation, backgroundBlurAmount, edgeBlurAmount, flipHorizontal);
+  }
+}
 // demo: to download after 9sec
 // setTimeout(event => {
 //   console.log("stopping");

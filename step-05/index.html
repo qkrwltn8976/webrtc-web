@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head id="canvas">
+
+<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <title>Realtime communication with WebRTC</title>
@@ -13,9 +14,12 @@
   <h1>Realtime communication with WebRTC</h1>
 
   <div id="videos">
-    <video id="localVideo" autoplay muted playsinline></video>
-    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" height="300" width="480" autoplay muted playsinline></video>
+    <video id="remoteVideo" height="300" width="480" autoplay playsinline></video>
   </div>
+
+  <canvas id="canvas" height="280" width="480"></canvas>
+
   <video id="videoElem" autoplay playsinline></video>
   <button id="shareScreenBtn">화면공유</button>
   <button id="recordScreenBtn">녹화 시작</button>
@@ -25,6 +29,8 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
   <script src="js/main.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
 </body>
+
 </html>
