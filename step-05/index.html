@@ -8,9 +8,7 @@
   <link rel="stylesheet" href="/css/main.css" />
 
 </head>
-
 <body>
-
   <h1>Realtime communication with WebRTC</h1>
 
   <div id="videos">
@@ -24,6 +22,7 @@
   <button id="recordScreenBtn">녹화 시작</button>
   <button id="recordDownloadBtn">녹화 다운로드</button>
   <button id="blurScreenBtn">흐린배경</button>
+  <button id="whiteboardBtn">화이트보드</button>
   <!-- This file is automatically added/served when running "node index.js". -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
@@ -31,6 +30,20 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
   <script src="https://raw.githubusercontent.com/otalk/hark/master/hark.bundle.js" type="module"></script>
+  <script src="https://www.webrtc-experiment.com/Canvas-Designer/canvas-designer-widget.js"></script>
+  <script>
+    var designer = new CanvasDesigner();
+  
+    // both links are mandatory
+    // widget.html will internally use widget.js
+    designer.widgetHtmlURL = 'https://www.webrtc-experiment.com/Canvas-Designer/widget.html'; // you can place this file anywhere
+    designer.widgetJsURL = 'https://www.webrtc-experiment.com/Canvas-Designer/widget.js';     // you can place this file anywhere
+  </script>
+  <script>
+    // <iframe> will be appended to "document.body"
+    designer.appendTo(document.body || document.documentElement);
+  </script>
+  
 </body>
 
 </html>

@@ -58,6 +58,11 @@ socket.on('log', function (array) {
   console.log.apply(console, array);
 });
 
+socket.on('whiteboard', function (data) {
+  console.log("화이트보드보드보드&&&&&")
+  designer.syncData(data);
+});
+
 ////////////////////////////////////////////////
 
 function sendMessage(message) {
@@ -114,12 +119,14 @@ var videoElem = document.querySelector('#videoElem');
 var canvas = document.querySelector("#canvas");
 var blurVideo = document.querySelector("#blurVideo");
 var blurButton = document.querySelector("#blurScreenBtn");
+var whiteboardButton = document.querySelector("#whiteboardBtn");
 var mediaRecorder;
 
 shareButton.onclick = startCapture;
 recordButton.onclick = toggleRecording;
 downloadButton.onclick = download;
 blurButton.onclick = blurScreen;
+whiteboardButton.onclick = startWhiteboard;
 
 navigator.mediaDevices.getUserMedia(mediaOption)
   .then(gotStream)
@@ -229,7 +236,7 @@ const ctx = canvas.getContext('2d');
 
 localVideo.addEventListener('loadeddata', (event) => {
   console.log('Yay! The readyState just increased to  ' +
-      'HAVE_CURRENT_DATA or greater for the first time.');
+    'HAVE_CURRENT_DATA or greater for the first time.');
 });
 
 async function blurScreen() {
@@ -250,10 +257,10 @@ async function blurScreen() {
   // // localVideo.srcObject = ca
   // });
   // gotStream(await canvas.captureStream(25))
-  
+
   // 
   let blurStream = await canvas.captureStream();
-  if(blurStream) {
+  if (blurStream) {
     localVideo.srcObject = blurStream;
   }
   pc.addStream(blurStream)
@@ -272,6 +279,49 @@ async function perform(net) {
   }
 
 }
+
+
+// 화이트보드
+var designer = new CanvasDesigner()
+designer.appendTo(document.body);
+function startWhiteboard() {
+  console.log("화이트보드 클릭")
+  // designer.toDataURL('image/png', function (dataURL) {
+  //   window.open(dataURL);
+  // });
+  designer.addSyncListener(function (data) {
+    console.log("whiteboard================================")
+    console.log(data)
+    socket.emit('whiteboard', data);
+  });
+}
+
+
+
+designer.addSyncListener(function (data) {
+  console.log("whiteboard================================")
+  console.log(data)
+  socket.emit('whiteboard', data);
+});
+
+designer.widgetHtmlURL = './widget.html'
+designer.widgetJsURL = 'widget.min.js';
+
+var x = 0;
+var y = 0;
+var width = designer.iframe.clientWidth;
+var height = designer.iframe.clientHeight;
+
+var image = 'https://www.webrtc-experiment.com/images/RTCMultiConnection-STUN-TURN-usage.png';
+
+var points = [
+  ['image', [image, x, y, width, height, 1], ['2', '#6c96c8', 'rgba(0,0,0,0)', '1', 'source-over', 'round', 'round', '15px "Arial"']]
+];
+
+designer.syncData({
+  startIndex: 0,
+  points: points
+});
 // demo: to download after 9sec
 // setTimeout(event => {
 //   console.log("stopping");
@@ -289,6 +339,7 @@ async function gotStream(stream) {
     maybeStart();
   }
 }
+
 
 var constraints = {
   video: true
@@ -313,6 +364,10 @@ function maybeStart() {
     if (isInitiator) {
       doCall();
     }
+    console.log("whiteboard================================")
+    designer.addSyncListener(function (data) {
+      socket.emit('whiteboard', data);
+    });
   }
 }
 
@@ -463,3 +518,4 @@ navigator.mediaDevices.getUserMedia({ audio: true })
   .catch((err) => {
     console.error('Something wrong in capture stream', err);
   })
+

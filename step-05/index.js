@@ -13,15 +13,15 @@ const options = {
   cert: fs.readFileSync('./public.pem')
 };
 
-var fileServer = new(nodeStatic.Server)();
-let app = https.createServer(options, (req,res)=>{
+var fileServer = new (nodeStatic.Server)();
+let app = https.createServer(options, (req, res) => {
   fileServer.serve(req, res);
 }).listen(3000);
 
 console.log('Started chating server...');
 
 var io = socketIO.listen(app);
-io.sockets.on('connection', function(socket) {
+io.sockets.on('connection', function (socket) {
 
   // convenience function to log server messages on the client
   function log() {
@@ -30,27 +30,35 @@ io.sockets.on('connection', function(socket) {
     socket.emit('log', array);
   }
 
-  socket.on('message', function(message) {
+  socket.on('message', function (message) {
     log('Client said: ', message);
-	
-	if (message==="bye" && socket.rooms['foo']) {
-		io.of('/').in('foo').clients((error, socketIds) => {
-		if (error) throw error;
 
-		socketIds.forEach(socketId => {
-		//	if (socket.id===socketId) console.log('-------------------************');
-//			else socket.broadcast.emit('message', message);
-			io.sockets.sockets[socketId].leave('foo');
-		});
+    if (message === "bye" && socket.rooms['foo']) {
+      io.of('/').in('foo').clients((error, socketIds) => {
+        if (error) throw error;
 
-		});
-	} //else {
-		// for a real app, would be room-only (not broadcast)
-		socket.broadcast.emit('message', message);
-		
+        socketIds.forEach(socketId => {
+          //	if (socket.id===socketId) console.log('-------------------************');
+          //			else socket.broadcast.emit('message', message);
+          io.sockets.sockets[socketId].leave('foo');
+        });
+
+      });
+    } //else {
+    // for a real app, would be room-only (not broadcast)
+    socket.broadcast.emit('message', message);
+
+
   });
 
-  socket.on('create or join', function(room) {
+  var designer = new CanvasDesigner()
+  designer.appendTo(document.body);
+  socket.on('whiteboard', function (data) {
+    console.log("화이트보드보드보드&&&&&")
+    designer.syncData(data);
+  });
+  
+  socket.on('create or join', function (room) {
     log('Received request to create or join room ' + room);
 
     var clientsInRoom = io.sockets.adapter.rooms[room];
@@ -62,24 +70,24 @@ io.sockets.on('connection', function(socket) {
       socket.join(room);
       log('Client ID ' + socket.id + ' created room ' + room);
       socket.emit('created', room, socket.id);
-	  console.log('created');
+      console.log('created');
     } else {
       log('Client ID ' + socket.id + ' joined room ' + room);
       io.sockets.in(room).emit('join', room);
       socket.join(room);
       socket.emit('joined', room, socket.id);
       io.sockets.in(room).emit('ready');
-	  console.log('joined');
-    } 
+      console.log('joined');
+    }
     // else { // max two clients
     //   socket.emit('full', room);
     // }
   });
 
-  socket.on('ipaddr', function() {
+  socket.on('ipaddr', function () {
     var ifaces = os.networkInterfaces();
     for (var dev in ifaces) {
-      ifaces[dev].forEach(function(details) {
+      ifaces[dev].forEach(function (details) {
         if (details.family === 'IPv4' && details.address !== '127.0.0.1') {
           socket.emit('ipaddr', details.address);
         }
@@ -87,7 +95,7 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('bye', function(){
+  socket.on('bye', function () {
     console.log('received bye');
   });
 
