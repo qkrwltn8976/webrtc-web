@@ -8,7 +8,6 @@ var pc;
 var remoteStream;
 var turnReady;
 
-
 var pcConfig = {
   'iceServers': [{
     'urls': 'stun:stun.l.google.com:19302'
@@ -113,6 +112,7 @@ var recordButton = document.querySelector('button#recordScreenBtn');
 var downloadButton = document.querySelector('button#recordDownloadBtn');
 var videoElem = document.querySelector('#videoElem');
 var canvas = document.querySelector("#canvas");
+var blurVideo = document.querySelector("#blurVideo");
 var blurButton = document.querySelector("#blurScreenBtn");
 var mediaRecorder;
 
@@ -135,19 +135,21 @@ const captureOption = {
 }
 
 // 화면공유
+let captureStream = null;
+
 async function startCapture(captureOption) {
   console.log("공유시작")
-  let captureStream = null;
 
   try {
     captureStream = await navigator.mediaDevices.getDisplayMedia(captureOption);
     console.log(captureStream)
-    localVideo.srcObject = captureStream;
+    gotStream(captureStream)
+    // localVideo.srcObject = captureStream;
     // dumpOptionsInfo();
   } catch (err) {
     console.error("Error: " + err);
   }
-
+  pc.addStream(captureStream);
   // return captureStream;
 }
 
@@ -222,9 +224,15 @@ function download() {
   window.URL.revokeObjectURL(url);
 }
 
+// 흐린배경
 const ctx = canvas.getContext('2d');
 
-async function blurScreen() { 
+localVideo.addEventListener('loadeddata', (event) => {
+  console.log('Yay! The readyState just increased to  ' +
+      'HAVE_CURRENT_DATA or greater for the first time.');
+});
+
+async function blurScreen() {
   canvas.height = localVideo.videoHeight;
   canvas.width = localVideo.videoWidth;
 
@@ -233,11 +241,24 @@ async function blurScreen() {
     stride: 32,
     quantBytes: 4
   }
+
   bodyPix.load(options)
     .then(net => perform(net))
     .catch(err => console.log(err))
-  // localVideo.className = "blur";
-  // const net = await bodyPix.load();
+  // v.bind('loadeddata', async function (e) {
+  //   localVideo.srcObject = await canvas.captureStream(25); // 25 FPS
+  // // localVideo.srcObject = ca
+  // });
+  // gotStream(await canvas.captureStream(25))
+  
+  // 
+  let blurStream = await canvas.captureStream();
+  if(blurStream) {
+    localVideo.srcObject = blurStream;
+  }
+  pc.addStream(blurStream)
+  // let blur = blurVideo.captureStream();
+  // localVideo.srcObject = blur;
 }
 async function perform(net) {
   while (1) {
@@ -249,6 +270,7 @@ async function perform(net) {
 
     await bodyPix.drawBokehEffect(canvas, localVideo, segmentation, backgroundBlurAmount, edgeBlurAmount, flipHorizontal);
   }
+
 }
 // demo: to download after 9sec
 // setTimeout(event => {
@@ -258,7 +280,7 @@ async function perform(net) {
 
 
 
-function gotStream(stream) {
+async function gotStream(stream) {
   console.log('Adding local stream.');
   localStream = stream;
   localVideo.srcObject = stream;
@@ -417,3 +439,27 @@ function stop() {
   pc.close();
   pc = null;
 }
+
+/**화자 감지 */
+var audioContext = new AudioContext()
+var gainNode = audioContext.createGain();
+navigator.mediaDevices.getUserMedia({ audio: true })
+  .then((stream) => {
+    console.log('got stream', stream);
+    window.orginalStream = stream;
+    return stream;
+  })
+  .then((stream) => {
+    let audioSource = audioContext.createMediaStreamSource(stream);
+    let audioDestination = audioContext.createMediaStreamDestination();
+    audioSource.connect(gainNode);
+    gainNode.connect(audioDestination);
+    gainNode.gain.value = 1;
+    window.localStream = audioDestination.stream;
+    //audioElement.srcObject = window.localStream; //for playback
+    //you can add this stream to pc object
+    // pc.addStream(window.localStream);
+  })
+  .catch((err) => {
+    console.error('Something wrong in capture stream', err);
+  })

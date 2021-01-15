@@ -15,12 +15,11 @@
 
   <div id="videos">
     <video id="localVideo" height="300" width="480" autoplay muted playsinline></video>
-    <video id="remoteVideo" height="300" width="480" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
   </div>
 
   <canvas id="canvas" height="280" width="480"></canvas>
-
-  <video id="videoElem" autoplay playsinline></video>
+  <video id="blurVideo" autoplay playsinline></video>
   <button id="shareScreenBtn">화면공유</button>
   <button id="recordScreenBtn">녹화 시작</button>
   <button id="recordDownloadBtn">녹화 다운로드</button>
@@ -31,6 +30,7 @@
   <script src="js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
+  <script src="https://raw.githubusercontent.com/otalk/hark/master/hark.bundle.js" type="module"></script>
 </body>
 
 </html>
